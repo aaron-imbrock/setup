@@ -1,3 +1,5 @@
 
 
-wget -qO- http://localhost:8000/linux-setup.sh | sh
+wget -qO- https://aaron-imbrock.github.io/new-system-setup/linux-setup.sh | sh
+
+
