@@ -56,7 +56,9 @@ git clone https://github.com/aaron-imbrock/SF-All-Fonts.git $HOME/src/SF-All-Fon
 mkdir $HOME/.local/share/fonts/sf-family/
 rsync -avHP $HOME/src/SF-All-Fonts/*/*.otf $HOME/.local/share/fonts/sf-family
 
-
+# Update keepass
+git clone https://github.com/aaron-imbrock/keepass2.git /tmp/keepass2
+rsync --exclude '.git/' -avHP /tmp/keepass2/ /usr/lib/keepass2/
 
 # Regenerate the font cache
 fc-cache -f -v
