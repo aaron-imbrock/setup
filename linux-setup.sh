@@ -23,7 +23,7 @@ confirm_continue() {
 }
 
 if [ "$(id -u)" -ne 0 ]; then
-  echo "Please run as root, e.g.: curl -fsSL <url> | sudo bash" >&2
+  echo "Please run as root, e.g.: wget -qO- https://aaron-imbrock.github.io/new-system-setup/linux-setup.sh | sh" >&2
   exit 1
 fi
 
@@ -65,6 +65,12 @@ cat > /etc/apt/sources.list <<'EOF'
 
 EOF
 
+# Set APT::Install-Suggests defaults to false
+cat > /etc/apt/apt.conf.d/99no-recommends <<'EOF'
+APT::Install-Recommends "false";
+APT::Install-Suggests "false";
+EOF
+
 # /etc/apt/sources.list.d/debian.sources
 cat > /etc/apt/sources.list.d/debian.sources <<'EOF'
 Types: deb
@@ -84,7 +90,7 @@ apt update
 
 apt install -y \
 	curl vim neovim \
-	git tree rsync \
+	git tree rsync unzip \
 	build-essential ca-certificates debsig-verify sudo
 
 
@@ -97,6 +103,15 @@ git config --global pull.rebase false
 git config --global core.pager "cat"
 git config --global core.sshCommand "ssh -o IdentitiesOnly=yes -i ~/.ssh/stilnox_git"
 
+git init --bare $HOME/.cfg
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+config config --local status.showUntrackedFiles no
+config remote add origin https://github.com/aaron-imbrock/dotfiles.git
+config fetch origin
+config reset --hard origin/main
+config clean -f -d
+
 echo ""
-echo -n "Base system installed."
-confirm_continue "Install X11 and Openbox? (y/n): "
+echo -n "Base system installed. Remember to reboot."
+
+echo "To install X11/Openbox: wget -qO- https://aaron-imbrock.github.io/new-system-setup/linux-desktop-setup.sh | sh"
