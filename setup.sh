@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+
+readonly HOME=/home/aimbrock
+
 has_local() {
     # shellcheck disable=SC2034  # deliberately unused
     local _has_local
@@ -74,7 +77,7 @@ EOF
 # /etc/apt/sources.list.d/debian.sources
 cat > /etc/apt/sources.list.d/debian.sources <<'EOF'
 Types: deb
-URIs: http://mirror.us.oneandone.net/debian/
+URIs: http://deb.debian.org/debian/
 Suites: trixie trixie-updates trixie-backports
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
@@ -91,17 +94,30 @@ apt update
 apt install -y \
 	curl vim neovim \
 	git tree rsync unzip \
-	build-essential ca-certificates debsig-verify sudo
+	build-essential ca-certificates debsig-verify sudo openssh-server
 
 
 # Set Git Global Defaults
-git config --global user.name 'Aaron Imbrock'
-git config --global user.email 'aimbrock@gmail.com'
-git config --global core.editor "code --wait"
-git config --global init.defaultbranch main
-git config --global pull.rebase false
-git config --global core.pager "cat"
-git config --global core.sshCommand "ssh -o IdentitiesOnly=yes -i ~/.ssh/stilnox_git"
+cat > $HOME/.gitconfig <<'EOF'
+[user]
+  email = aimbrock@gmail.com
+  name = Aaron Imbrock
+[core]
+  editor = code --wait
+  pager = cat
+  sshCommand = ssh -o IdentitiesOnly=yes -i /home/aimbrock/.ssh/stilnox_git
+[init]
+  defaultbranch = main
+[http]
+    postBuffer = 157286400
+[delta]
+    navigate = true
+    line-numbers = true
+[merge]
+    conflictstyle = zdiff3
+[pull]
+  rebase = false
+EOF
 
 git init --bare $HOME/.cfg
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
@@ -112,6 +128,6 @@ config reset --hard origin/main
 config clean -f -d
 
 echo ""
-echo -n "Base system installed. Remember to reboot."
-
-echo "To install X11/Openbox: wget -qO- https://aaron-imbrock.github.io/new-system-setup/linux-desktop-setup.sh | sh"
+echo "Base system installed. Remember to reboot."
+echo ""
+echo "To install X11/Openbox: wget -qO- https://aaron-imbrock.github.io/setup/desktop.sh | sh"

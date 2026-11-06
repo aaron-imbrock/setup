@@ -1,5 +1,5 @@
 
 
-wget -qO- https://aaron-imbrock.github.io/new-system-setup/linux-setup.sh | sh
+wget -qO- https://aaron-imbrock.github.io/setup/setup.sh | sh
 
 

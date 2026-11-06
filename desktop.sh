@@ -2,6 +2,8 @@
 set -euo pipefail
 
 readonly HOME=/home/aimbrock
+readonly USER='aimbrock'
+readonly GROUP='aimbrock'
 
 
 has_local() {
@@ -38,22 +40,23 @@ confirm_continue "Install X11 and Openbox? (y/n): "
 cd /tmp
 
 apt install -y \
-  xserver-xorg-core xserver-xorg-input-libinput xinit openbox x11-xserver-utils firmware-misc-nonfree \
+  xserver-xorg-core xserver-xorg-input-libinput xinit openbox x11-xserver-utils \
   lxpolkit hsetroot picom pcmanfm xscreensaver xfce4-notifyd \
   mate-media mate-power-manager \
   pipewire-pulse wireplumber \
-  alacritty iputils-ping lemonbar
+  alacritty iputils-ping lemonbar lxde-icon-theme arandr
 
 echo ""
 echo "Install of: X11 and Openbox completed."
 
 echo "Add Fonts..."
-
-cd $HOME/src/
-git clone https://github.com/aaron-imbrock/SF-All-Fonts.git
+rm -rf $HOME/src/SF-All-Fonts
+git clone https://github.com/aaron-imbrock/SF-All-Fonts.git $HOME/src/SF-All-Fonts
 
 mkdir $HOME/.local/share/fonts/sf-family/
-cp $HOME/src/SF-All-Fonts/*/*.otf $HOME/.local/share/fonts/sf-family
+rsync -avHP $HOME/src/SF-All-Fonts/*/*.otf $HOME/.local/share/fonts/sf-family
+
+
 
 # Regenerate the font cache
 fc-cache -f -v
@@ -63,8 +66,8 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 echo "uv install" >> $HOME/.bashrc.local
 echo 'eval "$(uv generate-shell-completion bash)"' >> $HOME/.bashrc.local
 
-chmod -R aimbrock:aimbrock $HOME
+chown -R $USER:$GROUP $HOME
 
-
+rm -rf $HOME/src/SF-All-Fonts
 
 echo "X11 setup completed"
